@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TimTrade — Platform Bagi Hasil Trading Tim (DEMO)</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; background: #070b14; color: #e8eef7; padding-bottom: 76px; }
+  .demo-banner { background: linear-gradient(90deg, #f59e0b, #fbbf24); color: #1a1a1a; text-align: center; font-size: 12px; font-weight: 800; padding: 9px 12px; line-height: 1.4; }
+  header { background: linear-gradient(180deg, #0d1526, #0b1220); padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; position: sticky; top: 0; z-index: 10; }
+  .logo { font-size: 22px; font-weight: 900; letter-spacing: .3px; background: linear-gradient(90deg, #34d399, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .logo span { color: #e8eef7; -webkit-text-fill-color: #e8eef7; }
+  .user-chip { font-size: 12px; background: #1e293b; padding: 7px 12px; border-radius: 999px; color: #94a3b8; border: 1px solid #334155; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .card { background: linear-gradient(180deg, #101a2e, #0d1526); border: 1px solid #1e293b; border-radius: 16px; padding: 18px; margin-bottom: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+  .card h2 { font-size: 16px; margin-bottom: 10px; color: #34d399; }
+  .card h3 { font-size: 15px; margin-bottom: 6px; color: #f1f5f9; }
+  .card p, .card li { font-size: 14px; line-height: 1.65; color: #cbd5e1; }
+  .card ul { padding-left: 18px; }
+  .saldo-big { font-size: 34px; font-weight: 900; background: linear-gradient(90deg, #34d399, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .saldo-sub { font-size: 13px; color: #94a3b8; }
+  .actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn { flex: 1; text-align: center; padding: 13px; border-radius: 12px; font-weight: 800; font-size: 14px; border: none; cursor: pointer; }
+  .btn-green { background: linear-gradient(90deg, #10b981, #22d3ee); color: #052e16; }
+  .btn-dark { background: #1e293b; color: #e8eef7; border: 1px solid #334155; }
+  /* Aset ala dompet Web3: daftar tetap, tidak digeser */
+  .asset { display: flex; align-items: center; gap: 12px; padding: 13px 2px; border-bottom: 1px solid #1e293b; }
+  .asset:last-child { border-bottom: none; }
+  .coin { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; color: #0b1220; flex-shrink: 0; }
+  .coin-btc { background: #f7931a; color: #fff; }
+  .coin-eth { background: #627eea; color: #fff; }
+  .coin-bnb { background: #f0b90b; }
+  .coin-sol { background: linear-gradient(135deg, #9945ff, #14f195); color: #fff; }
+  .coin-xrp { background: #23292f; color: #fff; border: 1px solid #475569; }
+  .asset-info { flex: 1; }
+  .asset-name { font-weight: 800; font-size: 15px; }
+  .asset-sub { font-size: 12px; color: #94a3b8; }
+  .asset-price { text-align: right; }
+  .asset-price b { font-size: 15px; }
+  .asset-price div { font-size: 12px; color: #94a3b8; }
+  .steps { counter-reset: s; }
+  .step { display: flex; gap: 12px; margin-bottom: 12px; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #10b981, #22d3ee); color: #052e16; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+  .pkg { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid #1e293b; }
+  .pkg:last-child { border-bottom: none; }
+  .pkg-name { font-weight: 800; font-size: 15px; }
+  .pkg-price { color: #34d399; font-weight: 900; }
+  .pkg-note { font-size: 12px; color: #94a3b8; }
+  .risk { background: linear-gradient(180deg, #451a03, #3a1502); border: 1px solid #92400e; border-radius: 14px; padding: 15px; font-size: 13px; line-height: 1.65; color: #fed7aa; margin-bottom: 14px; }
+  .risk b { color: #fbbf24; }
+  .muted { font-size: 12px; color: #94a3b8; line-height: 1.55; }
+  .row { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 9px 0; border-bottom: 1px solid #1e293b; }
+  .row:last-child { border-bottom: none; }
+  .row span:first-child { color: #94a3b8; }
+  .row span:last-child { text-align: right; font-weight: 700; }
+  nav.bottom { position: fixed; left: 0; right: 0; bottom: 0; background: #0d1526; border-top: 1px solid #1e293b; display: flex; z-index: 10; }
+  nav.bottom button { flex: 1; background: none; border: none; color: #94a3b8; font-size: 12px; font-weight: 800; padding: 13px 0 15px; cursor: pointer; }
+  nav.bottom button.active { color: #34d399; }
+  .empty { text-align: center; color: #94a3b8; font-size: 14px; padding: 18px 0; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: #134e4a; color: #5eead4; border: 1px solid #2dd4bf; }
+</style>
+</head>
+<body>
+<div class="demo-banner">DEMO — Template platform bagi-hasil trading tim. Bukan platform investasi aktif. Tidak menerima setoran uang asli.</div>
+<header>
+  <div class="logo">Tim<span>Trade</span></div>
+  <div class="user-chip">Demo • Pengunjung</div>
+</header>
+<main>
+  <!-- HOME -->
+  <section class="page active" id="page-home">
+    <div class="card">
+      <div class="saldo-sub">Total Saldo (demo)</div>
+      <div class="saldo-big">0.00 KOIN</div>
+      <div class="saldo-sub">$0.00 • Kurs: 1 Koin = $0.80 (contoh)</div>
+      <div class="actions">
+        <button class="btn btn-green" onclick="alert('Demo: tombol Trade tidak aktif.')">Trade</button>
+        <button class="btn btn-dark" onclick="alert('Demo: Chat CS tidak aktif.')">Chat CS</button>
+        <button class="btn btn-dark" onclick="alert('Demo: status akun tidak aktif.')">Nonactive</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Aset — Harga Pasar (contoh, 10 Nov 2026)</h2>
+      <div class="asset"><div class="coin coin-btc">₿</div><div class="asset-info"><div class="asset-name">Bitcoin</div><div class="asset-sub">BTC • Saldo demo 0</div></div><div class="asset-price"><b>$75,144</b><div>≈ Rp —</div></div></div>
+      <div class="asset"><div class="coin coin-eth">Ξ</div><div class="asset-info"><div class="asset-name">Ethereum</div><div class="asset-sub">ETH • Saldo demo 0</div></div><div class="asset-price"><b>$2,129</b><div>≈ Rp —</div></div></div>
+      <div class="asset"><div class="coin coin-bnb">B</div><div class="asset-info"><div class="asset-name">BNB</div><div class="asset-sub">BNB • Saldo demo 0</div></div><div class="asset-price"><b>$691</b><div>≈ Rp —</div></div></div>
+      <div class="asset"><div class="coin coin-sol">S</div><div class="asset-info"><div class="asset-name">Solana</div><div class="asset-sub">SOL • Saldo demo 0</div></div><div class="asset-price"><b>$86.70</b><div>≈ Rp —</div></div></div>
+      <div class="asset"><div class="coin coin-xrp">X</div><div class="asset-info"><div class="asset-name">XRP</div><div class="asset-sub">XRP • Saldo demo 0</div></div><div class="asset-price"><b>$1.1058</b><div>≈ Rp —</div></div></div>
+      <p class="muted" style="margin-top:10px">Harga di atas adalah contoh dari pengecekan 10 Nov 2026 dan ditampilkan sebagai daftar tetap seperti dompet Web3 — tidak digeser atau di-scroll.</p>
+    </div>
+    <div class="card">
+      <h2>TENTANG TIMTRADE — Dikelola Tim Trading</h2>
+      <p>Dana partisipasi dikelola oleh tim trader manusia di Crypto, Forex, dan Gold dalam satu ekosistem. Platform ini <b>tidak memakai klaim "bot AI"</b> — trading dilakukan manual oleh tim, dan hasilnya dibagikan sesuai kinerja yang sebenarnya.</p>
+    </div>
+    <div class="card">
+      <h2>Cara Kerja</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div><h3>Partisipasi &amp; Dapatkan Koin</h3><p>Dana partisipasi dikonversi menjadi Koin, unit bagi-hasil platform. Minimal partisipasi $10.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div><h3>Tim Trading Bekerja</h3><p>Tim trader mengelola dana dan mencatat hasil trading setiap hari.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div><h3>Hasil Dibagikan Sesuai Kinerja</h3><p>Hasil trading dibagikan setiap hari sebanding dengan Koin yang dimiliki, berdasarkan kinerja yang sebenarnya — bukan angka tetap.</p></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Fitur</h2>
+      <ul>
+        <li><b>Hasil Dibagi Sesuai Kinerja</b> — hasil trading tim dibagikan harian, besarnya mengikuti kinerja nyata (naik-turun, tidak tetap).</li>
+        <li><b>Rabat Harian hingga 1%</b> — rabat dari aktivitas trading, dibagikan harian. Besarnya mengikuti hasil yang sebenarnya (variabel, tidak tetap dan tidak dijamin).</li>
+        <li><b>Bonus Referral 10% (1x)</b> — dibayar satu kali saat referral yang kamu undang sudah deposit.</li>
+        <li><b>Koin Sebagai Aset</b> — hasil diterima dalam bentuk Koin.</li>
+        <li><b>Kurs Tetap (contoh)</b> — 1 Koin = $0.80, dapat ditukar kapan saja selama dana tersedia dari hasil trading.</li>
+      </ul>
+    </div>
+    <div class="risk"><b>Penting — baca dulu:</b> Tidak ada jaminan profit. Trading bisa untung dan bisa rugi. Platform ini <b>tidak menjanjikan profit harian tetap</b> (misalnya 1,5% per hari atau 20% per bulan), karena tidak ada trading yang bisa menjamin angka itu. Rabat harian "hingga 1%" artinya batas atas, bukan janji — besarnya mengikuti hasil yang sebenarnya. Jangan partisipasi dengan uang yang tidak siap hilang.</div>
+    <div class="card">
+      <h2>Aktivitas Terbaru</h2>
+      <div class="empty">Belum Ada Histori — Anda belum memiliki histori Koin.</div>
+    </div>
+  </section>
+
+  <!-- PAKET -->
+  <section class="page" id="page-paket">
+    <div class="card">
+      <h2>Paket Partisipasi</h2>
+      <p>Durasi tiap paket 180 hari. <b>Bagi hasil harian bersifat variabel</b> mengikuti kinerja trading tim — tidak ada angka tetap yang dijamin.</p>
+    </div>
+    <div class="card">
+      <div class="pkg"><div><div class="pkg-name">BASIC</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$10.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">SILVER</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$50.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">TITANIUM</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$100.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">GOLD</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$250.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">PLATINUM</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$500.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">DIAMOND</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$1,000.00</div></div>
+      <div class="pkg"><div><div class="pkg-name">CROWN</div><div class="pkg-note">Bagi hasil: sesuai kinerja (variabel)</div></div><div class="pkg-price">$2,500.00</div></div>
+    </div>
+    <div class="card">
+      <h2>Paket Saya</h2>
+      <div class="row"><span>Total Partisipasi</span><span>$0.00</span></div>
+      <div class="row"><span>Total Hasil Diterima</span><span>0.00 Koin</span></div>
+      <div class="empty">Belum Ada Paket Aktif</div>
+      <p class="muted">Demo: tombol "Gabung Paket" tidak aktif. Tidak ada setoran uang asli di template ini.</p>
+    </div>
+  </section>
+
+  <!-- DOMPET -->
+  <section class="page" id="page-dompet">
+    <div class="card">
+      <h2>Dompet (demo)</h2>
+      <div class="row"><span>Saldo USDT</span><span>$0.00</span></div>
+      <div class="row"><span>Saldo Koin</span><span>0.00 Koin</span></div>
+      <div class="actions">
+        <button class="btn btn-green" onclick="alert('Demo: Deposit tidak aktif. Template ini tidak menerima uang asli.')">Deposit</button>
+        <button class="btn btn-dark" onclick="alert('Demo: Tukarkan Koin tidak aktif.')">Tukarkan Koin</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Aturan Deposit &amp; Penarikan</h2>
+      <div class="row"><span>Minimal deposit</span><span>$10</span></div>
+      <div class="row"><span>Minimal penarikan</span><span>$2</span></div>
+      <div class="row"><span>Frekuensi penarikan</span><span>1x per 24 jam</span></div>
+      <div class="row"><span>Jam penarikan</span><span>Senin–Jumat 09.00–17.00, Sabtu–Minggu 09.00–12.00 WIB</span></div>
+      <div class="row"><span>Biaya admin penarikan</span><span>10% dari jumlah penarikan</span></div>
+      <p class="muted" style="margin-top:10px">Penukaran hanya dapat dibayar dari hasil trading tim yang benar-benar ada. Jika hasil trading tidak cukup, penukaran tertunda — platform yang jujur tidak menutupinya dengan setoran member baru.</p>
+    </div>
+    <div class="card">
+      <h2>Riwayat Transaksi</h2>
+      <div class="empty">Belum ada transaksi.</div>
+    </div>
+  </section>
+
+  <!-- AKUN -->
+  <section class="page" id="page-akun">
+    <div class="card">
+      <h2>Akun (demo)</h2>
+      <div class="row"><span>Nama</span><span>Pengunjung Demo</span></div>
+      <div class="row"><span>Total Partisipasi</span><span>$0.00</span></div>
+      <div class="row"><span>Total Hasil</span><span>0.00 Koin</span></div>
+      <div class="row"><span>Bonus Referral</span><span>10% (1x, saat referral deposit)</span></div>
+      <div class="row"><span>Rabat Harian</span><span>hingga 1% (variabel)</span></div>
+      <div class="row"><span>Total Referral</span><span>0</span></div>
+      <div class="row"><span>Omset Grup</span><span>0 Koin</span></div>
+    </div>
+    <div class="card">
+      <h2>Bonus Referral — <span class="pill">10% • 1x</span></h2>
+      <p>Bonus referral 10% dibayar <b>satu kali</b> saat referral yang kamu undang sudah melakukan deposit. Tidak dibayar berulang untuk deposit yang sama.</p>
+    </div>
+    <div class="card">
+      <h2>Link Referral (demo)</h2>
+      <p class="muted">Link referral hanya aktif di platform yang sudah berjalan. Di template demo ini tidak ada link aktif.</p>
+    </div>
+    <div class="card">
+      <h2>Pengaturan</h2>
+      <div class="actions">
+        <button class="btn btn-dark" onclick="alert('Demo: Ganti Kata Sandi tidak aktif.')">Ganti Kata Sandi</button>
+        <button class="btn btn-dark" onclick="alert('Demo: Keluar tidak aktif.')">Keluar Akun</button>
+      </div>
+    </div>
+  </section>
+</main>
+<nav class="bottom">
+  <button class="active" data-page="home">Home</button>
+  <button data-page="dompet">Dompet</button>
+  <button data-page="paket">Paket</button>
+  <button data-page="akun">Akun</button>
+</nav>
+<script>
+  document.querySelectorAll('nav.bottom button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('nav.bottom button').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active'); });
+      document.getElementById('page-' + btn.dataset.page).classList.add('active');
+      window.scrollTo({ top: 0 });
+    });
+  });
+</script>
+</body>
+</html>
